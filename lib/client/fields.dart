@@ -1,5 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class FormRoot extends Center {
   FormRoot(Widget child)
@@ -27,6 +28,7 @@ class EmailFormField extends TextFormField {
             validator: (input) => input.isEmpty
                 ? 'Email required'
                 : !EmailValidator.validate(input) ? 'Wrong email format' : null,
+            inputFormatters: [BlacklistingTextInputFormatter(RegExp("[ ]"))],
             onSaved: onSaved,
             controller: controller,
             focusNode: focusNode,

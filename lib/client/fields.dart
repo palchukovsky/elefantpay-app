@@ -5,14 +5,14 @@ import 'package:flutter/services.dart';
 class FormRoot extends Center {
   FormRoot(Widget child)
       : super(
-            child: Padding(padding: const EdgeInsets.all(16.0), child: child));
+            child: Padding(padding: const EdgeInsets.all(56.0), child: child));
 }
 
 class Logo extends Padding {
   Logo({final FormFieldSetter<String> onSaved})
       : super(
             padding: const EdgeInsets.all(32.0),
-            child: Image(image: AssetImage('assets/images/logo.jpeg')));
+            child: Image(image: AssetImage('assets/images/screen.png')));
 }
 
 class EmailFormField extends TextFormField {

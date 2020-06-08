@@ -1,4 +1,5 @@
 import 'package:elefantpay/client/sign-up.dart';
+import 'package:elefantpay/client/sign-in.dart';
 import 'package:flutter/material.dart';
 import 'session.dart';
 import 'home.dart';
@@ -23,7 +24,7 @@ class App extends StatelessWidget {
             if (!session.isRegistered) {
               home = SignUpPage();
             } else if (!session.isAuthed) {
-              home = SignUpPage();
+              home = SignInPage();
             } else {
               home = HomePage();
             }

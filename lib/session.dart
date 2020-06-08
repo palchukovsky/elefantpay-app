@@ -5,51 +5,54 @@ final session = _Session();
 class _Session {
   FlutterSecureStorage _storage;
 
-  String _authToken = '';
-  String _clientId = '';
-  String _clientEmail = '';
+  String _authToken;
+  String _clientId;
+  String _clientEmail;
 
-  bool get isAuthed => _authToken.isNotEmpty;
+  bool get isAuthed => _authToken != null;
   String authToken() => _authToken;
 
-  bool get isRegistered => _clientId.isNotEmpty;
+  bool get isRegistered => _clientId != null;
   String get clientId => _clientId;
   String get clientEmail => _clientEmail;
 
-  Future load() async {
+  load() async {
     if (_storage != null) {
       return;
     }
     _storage = FlutterSecureStorage();
+    await _read();
+  }
+
+  _read() async {
     Map<String, String> vals = await _storage.readAll();
     _authToken = vals['authToken'];
     _clientId = vals['clientId'];
-    _clientEmail = vals['cleintEmail'];
+    _clientEmail = vals['clientEmail'];
     _validate();
   }
 
   _save() async {
     _validate();
     _storage.deleteAll();
-    if (_authToken != null && _authToken.isNotEmpty) {
-      _storage.write(key: 'authToken', value: _authToken);
+    _writeKey('authToken', _authToken);
+    _writeKey('clientId', _clientId);
+    _writeKey('clientEmail', _clientEmail);
+    _read();
+  }
+
+  _writeKey(String key, String value) async {
+    if (value == null) {
+      return;
     }
-    if (_clientId != null && _clientId.isNotEmpty) {
-      _storage.write(key: 'clientId', value: _clientId);
-    }
-    if (_clientEmail != null && _clientEmail.isNotEmpty) {
-      _storage.write(key: 'cleintEmail', value: _clientEmail);
-    }
+    _storage.write(key: key, value: value);
   }
 
   _validate() {
-    if (_clientId == null ||
-        _clientId.isEmpty ||
-        _clientEmail == null ||
-        _clientEmail.isEmpty) {
-      _authToken = '';
-      _clientId = '';
-      _clientEmail = '';
+    if (_clientId == null || _clientEmail == null) {
+      _authToken = null;
+      _clientId = null;
+      _clientEmail = null;
     }
   }
 
@@ -57,7 +60,7 @@ class _Session {
     _clientId = "1";
     _clientEmail = email;
     _save();
-    return '';
+    return null;
   }
 
   Future<String> login(String email, String password) async {
@@ -65,6 +68,12 @@ class _Session {
     _clientEmail = email;
     _authToken = "2";
     _save();
-    return '';
+    return null;
+  }
+
+  logout() async {
+    _authToken = null;
+    _save();
+    return null;
   }
 }

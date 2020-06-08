@@ -1,6 +1,8 @@
+import 'package:elefantpay/client/fields.dart';
 import 'package:flutter/material.dart';
 import 'help.dart';
 import 'session.dart';
+import 'client/sign-in.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -13,11 +15,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Welcome'),
-      ),
-      body: Center(
-        child: Column(
+      appBar: AppBar(title: Text('Welcome')),
+      body: FormRoot(Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
@@ -31,10 +30,20 @@ class _HomePageState extends State<HomePage> {
                     'be ready to be one of the first customers!',
                 textAlign: TextAlign.center),
             Spacer(),
-          ],
-        ),
-      ),
+            InkWell(
+                child: Text('Sign Out',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                onTap: _signOut),
+            Spacer(),
+          ])),
       floatingActionButton: HelpFloatingButton(),
     );
+  }
+
+  _signOut() {
+    session.logout();
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => SignInPage()),
+        (Route<dynamic> route) => false);
   }
 }

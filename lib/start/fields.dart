@@ -27,9 +27,11 @@ class EmailFormField extends TextFormField {
             autofocus: false,
             validator: (input) => input.isEmpty
                 ? 'Email required'
-                : !EmailValidator.validate(input) ? 'Wrong email format' : null,
-            inputFormatters: [BlacklistingTextInputFormatter(RegExp("[ ]"))],
-            onSaved: onSaved,
+                : !EmailValidator.validate(input.trim())
+                    ? 'Wrong email format'
+                    : null,
+            keyboardType: TextInputType.emailAddress,
+            onSaved: (value) => onSaved(value.trim()),
             controller: controller,
             focusNode: focusNode,
             onFieldSubmitted: onFieldSubmitted);
@@ -60,6 +62,7 @@ class PasswordFormField extends TextFormField {
                   ? 'Password must have at least 4 characters'
                   : null;
             },
+            keyboardType: TextInputType.visiblePassword,
             onSaved: onSaved,
             onFieldSubmitted: onFieldSubmitted);
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'help.dart';
 import 'session.dart';
+import 'utils.dart';
 import 'start/sign-in.dart';
 import 'start/fields.dart';
 
@@ -29,6 +30,28 @@ class _HomePageState extends State<HomePage> {
                 'Your account ${session.clientEmail} is registered, ' +
                     'be ready to be one of the first customers!',
                 textAlign: TextAlign.center),
+            Spacer(),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text('For investment: '),
+                  InkWell(
+                      child: Text('invest@elefantpay.com',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      onTap: () => writeEmail('invest@elefantpay.com'))
+                ]),
+            Text(''),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text('For any questions: '),
+                  InkWell(
+                      child: Text('info@elefantpay.com',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      onTap: () => writeEmail('info@elefantpay.com'))
+                ]),
             Spacer(),
             InkWell(
                 child: Text('Sign Out',

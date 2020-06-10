@@ -1,8 +1,8 @@
-import 'package:elefantpay/client/fields.dart';
 import 'package:flutter/material.dart';
 import 'help.dart';
 import 'session.dart';
-import 'client/sign-in.dart';
+import 'start/sign-in.dart';
+import 'start/fields.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);

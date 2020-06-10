@@ -1,5 +1,5 @@
-import 'package:elefantpay/client/sign-up.dart';
-import 'package:elefantpay/client/sign-in.dart';
+import 'start/sign-up.dart';
+import 'start/sign-in.dart';
 import 'package:flutter/material.dart';
 import 'session.dart';
 import 'home.dart';

@@ -11,7 +11,7 @@ class FormRoot extends Center {
 class Logo extends Padding {
   Logo({final FormFieldSetter<String> onSaved})
       : super(
-            padding: const EdgeInsets.all(32.0),
+            padding: EdgeInsets.all(32.0),
             child: Image(image: AssetImage('assets/images/screen.png')));
 }
 
@@ -24,7 +24,7 @@ class EmailFormField extends TextFormField {
       : super(
             decoration: const InputDecoration(
                 hintText: 'Enter your email', labelText: 'Your account'),
-            autofocus: true,
+            autofocus: false,
             validator: (input) => input.isEmpty
                 ? 'Email required'
                 : !EmailValidator.validate(input) ? 'Wrong email format' : null,

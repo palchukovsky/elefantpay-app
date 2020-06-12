@@ -15,6 +15,8 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends StartPageState<SignUpPage> {
   bool _isRequested = false;
 
+  final TextEditingController _passwordConfirmController =
+      TextEditingController();
   final FocusNode _passwordConfirmFocus = FocusNode();
 
   _SignUpPageState() : super('Sign Up Your New Account', 'Sign Up');
@@ -41,7 +43,8 @@ class _SignUpPageState extends StartPageState<SignUpPage> {
           children: <Widget>[
             Spacer(),
             Text('Your account is almost ready!',
-                style: Theme.of(context).textTheme.headline5),
+                style: Theme.of(context).textTheme.headline5,
+                textAlign: TextAlign.center),
             Padding(
                 padding: const EdgeInsets.symmetric(vertical: 36.0),
                 child: Text(
@@ -72,12 +75,13 @@ class _SignUpPageState extends StartPageState<SignUpPage> {
       PasswordFormField(
           label: 'Password',
           hint: 'Create your password',
-          onSaved: (value) => onSaved,
+          onSaved: onSaved,
           controller: passwordController,
           focusNode: passwordFocus,
           onFieldSubmitted: (term) =>
               focusChange(context, passwordFocus, _passwordConfirmFocus)),
       PasswordFormField(
+        controller: _passwordConfirmController,
         label: 'Password confirmation',
         hint: 'Confirm your password',
         validate: (value) => value != passwordController.text

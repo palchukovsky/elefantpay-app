@@ -18,7 +18,7 @@ class Logo extends Padding {
 class EmailFormField extends TextFormField {
   EmailFormField(
       {final FormFieldSetter<String> onSaved,
-      final TextEditingController controller,
+      @required final TextEditingController controller,
       final FocusNode focusNode,
       final ValueChanged<String> onFieldSubmitted})
       : super(
@@ -43,7 +43,7 @@ class PasswordFormField extends TextFormField {
       @required final String hint,
       final FormFieldSetter<String> onSaved,
       final FormFieldValidator<String> validate,
-      final TextEditingController controller,
+      @required final TextEditingController controller,
       final FocusNode focusNode,
       final ValueChanged<String> onFieldSubmitted})
       : super(
@@ -72,7 +72,8 @@ class ErrorFormText extends Padding {
       : super(
             padding: const EdgeInsets.all(16.0),
             child: Text(error,
-                style: TextStyle(color: Theme.of(context).errorColor)));
+                style: TextStyle(color: Theme.of(context).errorColor),
+                textAlign: TextAlign.center));
 }
 
 focusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {

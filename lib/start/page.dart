@@ -13,6 +13,7 @@ abstract class StartPageState<T extends StatefulWidget> extends State<T> {
   String _error;
 
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
@@ -55,6 +56,7 @@ abstract class StartPageState<T extends StatefulWidget> extends State<T> {
                 Text(title, style: Theme.of(context).textTheme.headline6),
                 if (_error != null) ErrorFormText(_error, context),
                 EmailFormField(
+                    controller: _emailController,
                     onSaved: (value) => setState(() => _email = value),
                     focusNode: _emailFocus,
                     onFieldSubmitted: (term) =>

@@ -36,6 +36,7 @@ class _SignInPageState extends StartPageState<SignInPage> {
       FormFieldSetter<String> onSaved,
       void Function() submit) {
     return PasswordFormField(
+        controller: passwordController,
         label: 'Password',
         hint: 'Enter your password',
         onSaved: onSaved,

@@ -1,5 +1,6 @@
 import 'sign-in.dart';
 import 'fields.dart';
+import '../home.dart';
 import '../session.dart';
 import '../help.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +120,7 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
     final error = await session.confirm(_token);
     if (error == null) {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => SignInPage()),
+          MaterialPageRoute(builder: (context) => HomePage()),
           (Route<dynamic> route) => false);
       return true;
     }

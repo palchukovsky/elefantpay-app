@@ -61,7 +61,7 @@ class _Session {
     switch (response.statusCode) {
       case 204:
         _confirmRequest = null;
-        _save();
+        _updateAuth(response);
         return null;
       case 400: // The request has invalid parameters.
         return _decodeError(response);

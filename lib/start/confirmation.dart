@@ -118,6 +118,9 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
 
     final error = await session.confirm(_token);
     if (error == null) {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => SignInPage()),
+          (Route<dynamic> route) => false);
       return true;
     }
     setState(() {

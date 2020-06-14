@@ -40,11 +40,7 @@ class _Session {
         await _post('client', backend.ClientCredentials(email, password));
     switch (response.statusCode) {
       case 201:
-        _clientEmail = email;
-        _confirmRequest = backend.CredentialsConfirmationRequest.fromJson(
-                json.decode(response.body))
-            .confirmation;
-        _save();
+        _updateCofirmRequest(email, response);
         return null;
       case 400: // The request has invalid parameters.
         return _decodeError(response);
@@ -78,10 +74,19 @@ class _Session {
   }
 
   Future<String> login(final String email, final String password) async {
-    _clientEmail = email;
-    _authToken = "2";
-    _save();
-    return null;
+    final response =
+        await _post('client/login', backend.ClientCredentials(email, password));
+    switch (response.statusCode) {
+      case 201:
+        _updateAuth(response);
+        return null;
+      case 404:
+        return 'Email or password is invalid';
+      case 422:
+        _updateCofirmRequest(_clientEmail, response);
+        return 'Email is not confirmed';
+    }
+    return _decodeUnexpectedError(response);
   }
 
   logout() async {
@@ -136,14 +141,6 @@ class _Session {
     return 'Server error, please try again later';
   }
 
-  String _acceptCofirmRequest(final String email, final String confirmId) {
-    _clientEmail = email;
-    _confirmRequest = "1";
-    _twoFaCodeResendCountdown = DateTime.now().toUtc();
-    _save();
-    return null;
-  }
-
   Future<http.Response> _post(
       final String method, final backend.Request request) {
     return http.post('https://api-dev.elefantpay.com/' + method,
@@ -151,5 +148,24 @@ class _Session {
           'Content-Type': 'application/json; charset=UTF-8'
         },
         body: jsonEncode(request.toJson()));
+  }
+
+  void _updateCofirmRequest(final String email, final http.Response response) {
+    _clientEmail = email;
+    _confirmRequest = backend.CredentialsConfirmationRequest.fromJson(
+            json.decode(response.body))
+        .confirmation;
+    _twoFaCodeResendCountdown = DateTime.now().toUtc();
+    _save();
+    return null;
+  }
+
+  _updateAuth(final http.Response response) {
+    final authToken = response.headers["Auth-Token"];
+    if (authToken == null || _authToken == authToken) {
+      return;
+    }
+    _authToken = authToken;
+    _save();
   }
 }

@@ -47,7 +47,7 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
                   Spacer(),
                   if (!_isKeyboardVisible) Logo(),
                   Text(title, style: Theme.of(context).textTheme.headline6),
-                  if (_error != null) ErrorFormText(_error, context),
+                  if (_error != null) buildError(context),
                   EmailFormField(
                       controller: _emailController,
                       onSaved: (value) => setState(() => _email = value),
@@ -71,6 +71,11 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
                   Spacer(),
                 ]))),
         floatingActionButton: HelpFloatingButton());
+  }
+
+  @protected
+  Widget buildError(BuildContext context) {
+    return ErrorFormText(_error, context);
   }
 
   @protected

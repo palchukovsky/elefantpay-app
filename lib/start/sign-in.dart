@@ -1,4 +1,5 @@
 import 'sign-up.dart';
+import 'confirmation.dart';
 import 'fields.dart';
 import 'creds-page.dart';
 import '../session.dart';
@@ -26,6 +27,28 @@ class _SignInPageState extends CredsPageState<SignInPage> {
         MaterialPageRoute(builder: (context) => HomePage()),
         (Route<dynamic> route) => false);
     return true;
+  }
+
+  @protected
+  Widget buildError(BuildContext context) {
+    if (!session.isConfirmRequested) {
+      return super.buildError(context);
+    }
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          super.buildError(context),
+          InkWell(
+              child: Text('Confirm ' + session.clientEmail,
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ConfirmationPage()));
+              })
+        ]);
   }
 
   @override

@@ -24,7 +24,6 @@ class EmailFormField extends TextFormField {
       : super(
             decoration: const InputDecoration(
                 hintText: 'Enter your email', labelText: 'Your account'),
-            autofocus: false,
             validator: (input) => input.isEmpty
                 ? 'Email required'
                 : !EmailValidator.validate(input.trim())
@@ -59,7 +58,7 @@ class PasswordFormField extends TextFormField {
                 return validate(input);
               }
               return input.length <= 4
-                  ? 'Password must have at least 4 characters'
+                  ? 'Password must have at least 5 characters'
                   : null;
             },
             keyboardType: TextInputType.visiblePassword,
@@ -81,7 +80,10 @@ focusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
   FocusScope.of(context).requestFocus(nextFocus);
 }
 
-focusEnd(BuildContext context, FocusNode currentFocus, void Function() submit) {
+focusEnd(BuildContext context, FocusNode currentFocus,
+    Future<bool> Function() submit) async {
   currentFocus.unfocus();
-  submit();
+  if (!await submit()) {
+    currentFocus.requestFocus();
+  }
 }

@@ -1,6 +1,6 @@
 import 'sign-up.dart';
 import 'fields.dart';
-import 'page.dart';
+import 'creds-page.dart';
 import '../session.dart';
 import '../home.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ class SignInPage extends StatefulWidget {
   _SignInPageState createState() => _SignInPageState();
 }
 
-class _SignInPageState extends StartPageState<SignInPage> {
+class _SignInPageState extends CredsPageState<SignInPage> {
   _SignInPageState() : super('Sign In to Your Account', 'Sign In');
 
   @override

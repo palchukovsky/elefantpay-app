@@ -12,11 +12,13 @@ class _Session {
   String _authToken;
   String _clientEmail;
   String _confirmRequest;
+  var _twoFaCodeResendCountdown = DateTime.now().toUtc();
 
   bool get isAuthed => _authToken != null;
   String authToken() => _authToken;
 
   bool get isConfirmRequested => _confirmRequest != null;
+  DateTime get twoFaCodeSentTime => _twoFaCodeResendCountdown;
 
   bool get isRegistered => _clientEmail != null && _confirmRequest == null;
   String get clientEmail => _clientEmail;
@@ -29,48 +31,13 @@ class _Session {
     await _read();
   }
 
-  _read() async {
-    Map<String, String> vals = await _storage.readAll();
-    if (vals['authToken'] != _version) {
-      vals = {};
-    }
-    _authToken = vals['authToken'];
-    _confirmRequest = vals['confirmRequest'];
-    _clientEmail = vals['email'];
-    _validate();
-  }
-
-  _save() async {
-    _validate();
-    _storage.deleteAll();
-    _writeKey('version', _version);
-    _writeKey('authToken', _authToken);
-    _writeKey('email', _clientEmail);
-    _writeKey('confirmRequest', _confirmRequest);
-    _read();
-  }
-
-  _writeKey(String key, String value) async {
-    if (value == null) {
-      return;
-    }
-    _storage.write(key: key, value: value);
-  }
-
-  _validate() {
-    if (_clientEmail == null) {
-      _authToken = null;
-      _confirmRequest = null;
-    }
-  }
-
-  Future<String> register(String email, String password) async {
+  Future<String> register(final String email, final String password) async {
     _clientEmail = null;
     _confirmRequest = null;
     _save();
 
     final response =
-        await post('client', backend.ClientCredentials(email, password));
+        await _post('client', backend.ClientCredentials(email, password));
     switch (response.statusCode) {
       case 201:
         _clientEmail = email;
@@ -87,7 +54,30 @@ class _Session {
     return _decodeUnexpectedError(response);
   }
 
-  Future<String> login(String email, String password) async {
+  Future<String> resend2faCode() async {
+    _twoFaCodeResendCountdown = DateTime.now().toUtc();
+    return null;
+  }
+
+  Future<String> confirm(final String token) async {
+    final response = await _post('client/credentials/confirmation',
+        backend.CredentialsConfirmation(_confirmRequest, token));
+    switch (response.statusCode) {
+      case 204:
+        _confirmRequest = null;
+        _save();
+        return null;
+      case 400: // The request has invalid parameters.
+        return _decodeError(response);
+      case 404:
+        return 'PIN is not valid PIN to confirm email ' + _clientEmail;
+      case 409:
+        return 'Email already used';
+    }
+    return _decodeUnexpectedError(response);
+  }
+
+  Future<String> login(final String email, final String password) async {
     _clientEmail = email;
     _authToken = "2";
     _save();
@@ -100,7 +90,41 @@ class _Session {
     return null;
   }
 
-  String _decodeError(http.Response response) {
+  _read() async {
+    Map<String, String> vals = await _storage.readAll();
+    if (vals['version'] != _version) {
+      vals = {};
+    }
+    _authToken = vals['authToken'];
+    _confirmRequest = vals['confirmRequest'];
+    _clientEmail = vals['email'];
+    _validate();
+  }
+
+  _save() async {
+    _validate();
+    _storage.deleteAll();
+    _writeKey('version', _version);
+    _writeKey('authToken', _authToken);
+    _writeKey('email', _clientEmail);
+    _writeKey('confirmRequest', _confirmRequest);
+  }
+
+  _writeKey(final String key, final String value) async {
+    if (value == null) {
+      return;
+    }
+    _storage.write(key: key, value: value);
+  }
+
+  _validate() {
+    if (_clientEmail == null) {
+      _authToken = null;
+      _confirmRequest = null;
+    }
+  }
+
+  String _decodeError(final http.Response response) {
     final error = backend.Error.fromJson(json.decode(response.body));
     if (error.message == null || error.message == "") {
       return _decodeUnexpectedError(response);
@@ -108,11 +132,19 @@ class _Session {
     return error.message;
   }
 
-  String _decodeUnexpectedError(http.Response response) {
+  String _decodeUnexpectedError(final http.Response response) {
     return 'Server error, please try again later';
   }
 
-  Future<http.Response> post(
+  String _acceptCofirmRequest(final String email, final String confirmId) {
+    _clientEmail = email;
+    _confirmRequest = "1";
+    _twoFaCodeResendCountdown = DateTime.now().toUtc();
+    _save();
+    return null;
+  }
+
+  Future<http.Response> _post(
       final String method, final backend.Request request) {
     return http.post('https://api-dev.elefantpay.com/' + method,
         headers: <String, String>{

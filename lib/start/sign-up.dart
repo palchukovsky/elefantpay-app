@@ -1,8 +1,8 @@
-import 'fields.dart';
 import 'sign-in.dart';
-import 'page.dart';
+import 'confirmation.dart';
+import 'creds-page.dart';
+import 'fields.dart';
 import '../session.dart';
-import '../help.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -12,9 +12,7 @@ class SignUpPage extends StatefulWidget {
   _SignUpPageState createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends StartPageState<SignUpPage> {
-  bool _isRequested = false;
-
+class _SignUpPageState extends CredsPageState<SignUpPage> {
   final TextEditingController _passwordConfirmController =
       TextEditingController();
   final FocusNode _passwordConfirmFocus = FocusNode();
@@ -23,45 +21,15 @@ class _SignUpPageState extends StartPageState<SignUpPage> {
 
   @override
   Future<String> request(String email, String password) {
-    _isRequested = true;
     return session.register(email, password);
   }
 
   @override
-  Widget buildForm(BuildContext context) {
-    return !_isRequested || hasError
-        ? super.buildForm(context)
-        : _buildResult(context);
-  }
-
-  Widget _buildResult(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('New account')),
-      body: FormRoot(Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Spacer(),
-            Text('Your account is almost ready!',
-                style: Theme.of(context).textTheme.headline5,
-                textAlign: TextAlign.center),
-            Padding(
-                padding: const EdgeInsets.symmetric(vertical: 36.0),
-                child: Text(
-                    'Check email ${session.clientEmail} ' +
-                        'to confirm it and complete registration.',
-                    textAlign: TextAlign.center)),
-            InkWell(
-                child: Text('Sign In',
-                    style: Theme.of(context).textTheme.headline6),
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SignInPage()));
-                }),
-            Spacer(),
-          ])),
-      floatingActionButton: HelpFloatingButton(),
-    );
+  bool handleSuccess() {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => ConfirmationPage()),
+        (Route<dynamic> route) => false);
+    return true;
   }
 
   @override
@@ -81,16 +49,15 @@ class _SignUpPageState extends StartPageState<SignUpPage> {
           onFieldSubmitted: (term) =>
               focusChange(context, passwordFocus, _passwordConfirmFocus)),
       PasswordFormField(
-        controller: _passwordConfirmController,
-        label: 'Password confirmation',
-        hint: 'Confirm your password',
-        validate: (value) => value != passwordController.text
-            ? 'Password confirmation does not match'
-            : null,
-        focusNode: _passwordConfirmFocus,
-        onFieldSubmitted: (term) =>
-            focusEnd(context, _passwordConfirmFocus, submit),
-      ),
+          controller: _passwordConfirmController,
+          label: 'Password confirmation',
+          hint: 'Confirm your password',
+          validate: (value) => value != passwordController.text
+              ? 'Password confirmation does not match'
+              : null,
+          focusNode: _passwordConfirmFocus,
+          onFieldSubmitted: (term) =>
+              focusEnd(context, _passwordConfirmFocus, submit))
     ]);
   }
 

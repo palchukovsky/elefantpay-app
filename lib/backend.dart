@@ -31,3 +31,13 @@ class CredentialsConfirmationRequest {
     return CredentialsConfirmationRequest(json['confirmation']);
   }
 }
+
+class CredentialsConfirmation extends Request {
+  final String id;
+  final String token;
+
+  CredentialsConfirmation(this.id, this.token);
+
+  @override
+  Map<String, dynamic> toJson() => {'id': id, 'token': token};
+}

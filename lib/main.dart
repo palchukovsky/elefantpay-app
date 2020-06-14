@@ -1,5 +1,6 @@
 import 'start/sign-up.dart';
 import 'start/sign-in.dart';
+import 'start/confirmation.dart';
 import 'package:flutter/material.dart';
 import 'session.dart';
 import 'home.dart';
@@ -22,7 +23,9 @@ class App extends StatelessWidget {
             break;
           default:
             if (!session.isRegistered) {
-              home = SignUpPage();
+              home = !session.isConfirmRequested
+                  ? SignUpPage()
+                  : ConfirmationPage();
             } else if (!session.isAuthed) {
               home = SignInPage();
             } else {

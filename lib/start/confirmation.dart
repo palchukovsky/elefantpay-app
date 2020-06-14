@@ -1,0 +1,164 @@
+import 'sign-in.dart';
+import 'fields.dart';
+import '../session.dart';
+import '../help.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:async';
+
+class ConfirmationPage extends StatefulWidget {
+  ConfirmationPage({Key key}) : super(key: key);
+
+  @override
+  _ConfirmationPageState createState() => _ConfirmationPageState();
+}
+
+class _ConfirmationPageState extends State<ConfirmationPage> {
+  var _isBusy = false;
+  String _error;
+  String _twofaCodeResendCountDown;
+  final _formKey = GlobalKey<FormState>();
+  final _controller = TextEditingController();
+  final _focusNode = FocusNode();
+  String _token;
+
+  @protected
+  void initState() {
+    super.initState();
+    _check2FaCodeResendAbility();
+  }
+
+  @override
+  Widget build(final BuildContext context) {
+    if (_isBusy) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    return Scaffold(
+        appBar: AppBar(title: Text('New account')),
+        body: FormRoot(Form(
+            key: _formKey,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Spacer(),
+                  Text('Your account is almost ready!',
+                      style: Theme.of(context).textTheme.headline6),
+                  Spacer(),
+                  Text(
+                      'Check email ${session.clientEmail} ' +
+                          'to confirm it and complete registration.',
+                      textAlign: TextAlign.center),
+                  Spacer(),
+                  if (_error != null) ErrorFormText(_error, context),
+                  TextFormField(
+                      decoration: InputDecoration(
+                          labelText: "Confirmation PIN",
+                          hintText: "Enter confirmation PIN from email"),
+                      keyboardType: TextInputType.number,
+                      onSaved: (value) => _token = value,
+                      controller: _controller,
+                      focusNode: _focusNode,
+                      onFieldSubmitted: (term) =>
+                          focusEnd(context, _focusNode, _request),
+                      textAlign: TextAlign.center,
+                      maxLength: 4,
+                      validator: (input) => input.isEmpty
+                          ? 'PIN is required'
+                          : input.length != 4
+                              ? 'PIN has length 4 digits'
+                              : null,
+                      inputFormatters: [
+                        WhitelistingTextInputFormatter(RegExp("[\\d]"))
+                      ]),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: RaisedButton(
+                          onPressed: _request, child: Text("Confirm"))),
+                  Spacer(),
+                  Row(children: <Widget>[
+                    Spacer(),
+                    Text('Resend PIN: '),
+                    if (_twofaCodeResendCountDown == "")
+                      InkWell(
+                          child: Text('Resend',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          onTap: _resend2faCode),
+                    if (_twofaCodeResendCountDown != "")
+                      Text(_twofaCodeResendCountDown),
+                    Spacer()
+                  ]),
+                  Text(""),
+                  Row(children: <Widget>[
+                    Spacer(),
+                    Text('Already confirmed? '),
+                    InkWell(
+                        child: Text('Sign In',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SignInPage()));
+                        }),
+                    Spacer()
+                  ]),
+                  Spacer(),
+                ]))),
+        floatingActionButton: HelpFloatingButton());
+  }
+
+  Future<bool> _request() async {
+    if (!_formKey.currentState.validate()) {
+      return false;
+    }
+    setState(() => _isBusy = true);
+    _formKey.currentState.save();
+
+    final error = await session.confirm(_token);
+    if (error == null) {
+      return true;
+    }
+    setState(() {
+      _error = error;
+      _isBusy = false;
+    });
+    return false;
+  }
+
+  _resend2faCode() async {
+    final error = await session.resend2faCode();
+    setState(() => _error = error);
+    _check2FaCodeResendAbility();
+  }
+
+  _check2FaCodeResendAbility() {
+    final now = DateTime.now().toUtc();
+    final sentTime = session.twoFaCodeSentTime;
+    final nextSendTime = sentTime.add(Duration(minutes: 3));
+    final diff = nextSendTime.difference(now);
+    if (diff.isNegative) {
+      setState(() => _twofaCodeResendCountDown = "");
+      return;
+    }
+
+    String twoDigits(final int n) {
+      if (n >= 10) {
+        return "$n";
+      }
+      return "0$n";
+    }
+
+    final minutes = twoDigits(diff.inMinutes.remainder(60));
+    final seconds = twoDigits(diff.inSeconds.remainder(60));
+    final countdown = "after $minutes:$seconds";
+    setState(() {
+      _twofaCodeResendCountDown = countdown;
+    });
+
+    Timer(const Duration(seconds: 1), () {
+      _check2FaCodeResendAbility();
+    });
+  }
+}

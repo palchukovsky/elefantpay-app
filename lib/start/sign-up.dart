@@ -17,7 +17,7 @@ class _SignUpPageState extends CredsPageState<SignUpPage> {
       TextEditingController();
   final FocusNode _passwordConfirmFocus = FocusNode();
 
-  _SignUpPageState() : super('Sign Up Your New Account', 'Sign Up');
+  _SignUpPageState() : super('Create Your New Account', 'Sign Up');
 
   @override
   Future<String> request(String email, String password) {

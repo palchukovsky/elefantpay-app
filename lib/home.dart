@@ -24,11 +24,11 @@ class _HomePageState extends State<HomePage> {
             Spacer(),
             Text('New ultimate mobile wallet'),
             Text('ElefantPay', style: Theme.of(context).textTheme.headline2),
-            Text('comming soon', style: Theme.of(context).textTheme.headline4),
+            Text('coming soon', style: Theme.of(context).textTheme.headline4),
             Spacer(),
             Text(
                 'Your account ${session.clientEmail} is registered, ' +
-                    'be ready to be one of the first customers!',
+                    'get ready to become one of the first customers!',
                 textAlign: TextAlign.center),
             Spacer(),
             Row(

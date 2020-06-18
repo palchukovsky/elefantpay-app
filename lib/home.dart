@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Welcome')),
+      appBar: AppBar(title: Text('Welcome, ${session.clientName}')),
       body: FormRoot(Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -26,9 +26,9 @@ class _HomePageState extends State<HomePage> {
             Text('ElefantPay', style: Theme.of(context).textTheme.headline2),
             Text('coming soon', style: Theme.of(context).textTheme.headline4),
             Spacer(),
-            Text(
-                'Your account ${session.clientEmail} is registered, ' +
-                    'get ready to become one of the first customers!',
+            Text('Your account ${session.clientEmail} is registered.',
+                textAlign: TextAlign.center),
+            Text('Get ready to become one of the first customers!',
                 textAlign: TextAlign.center),
             Spacer(),
             Row(

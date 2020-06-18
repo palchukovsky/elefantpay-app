@@ -12,6 +12,7 @@ class _Session {
 
   static const _version = "1";
   String _authToken;
+  String _clientName;
   String _clientEmail;
   String _confirmRequest;
   var _twoFaCodeResendCountdown = DateTime.now().toUtc();
@@ -23,6 +24,7 @@ class _Session {
   DateTime get twoFaCodeSentTime => _twoFaCodeResendCountdown;
 
   bool get isRegistered => _clientEmail != null && _confirmRequest == null;
+  String get clientName => _clientName;
   String get clientEmail => _clientEmail;
 
   load() async {
@@ -33,17 +35,14 @@ class _Session {
     await _read();
   }
 
-  Future<String> register(final String email, final String password) async {
-    _clientEmail = null;
-    _confirmRequest = null;
-    _save();
-
-    final response =
-        await _post('client', backend.ClientCredentials(email, password));
+  Future<String> register(
+      final String name, final String email, final String password) async {
+    final response = await _post(
+        'client', backend.ClientRegistration(name, email, password));
     switch (response.statusCode) {
       case 201:
-        _updateCofirmRequest(email, response);
-        return null;
+        _clientEmail = email;
+        return _saveCofirmRequest(response);
       case 400: // The request has invalid parameters.
         return _decodeError(response);
       case 409:
@@ -57,8 +56,7 @@ class _Session {
         'client/credentials/confirmation', backend.ClientEmail(_clientEmail));
     switch (response.statusCode) {
       case 202:
-        _updateCofirmRequest(_clientEmail, response);
-        return null;
+        return _saveCofirmRequest(response);
       case 400: // The request has invalid parameters.
       case 404: // Provided credentials are not used for any client.
         return _decodeError(response);
@@ -74,10 +72,8 @@ class _Session {
     final response = await _post('client/credentials/confirmation',
         backend.CredentialsConfirmation(_confirmRequest, token));
     switch (response.statusCode) {
-      case 204:
-        _confirmRequest = null;
-        _updateAuth(response);
-        return null;
+      case 200:
+        return _saveUserInfo(response);
       case 400: // The request has invalid parameters.
         return _decodeError(response);
       case 404:
@@ -93,13 +89,17 @@ class _Session {
         await _post('client/login', backend.ClientCredentials(email, password));
     switch (response.statusCode) {
       case 201:
-        _updateAuth(response);
-        return null;
+        return _saveUserInfo(response);
       case 404:
         return 'Email or password is invalid';
       case 422:
-        _updateCofirmRequest(_clientEmail, response);
-        return 'Email is not confirmed';
+        {
+          final error = _saveCofirmRequest(response);
+          if (error != null) {
+            return error;
+          }
+          return 'Email is not confirmed';
+        }
     }
     return _decodeUnexpectedError(response);
   }
@@ -117,6 +117,7 @@ class _Session {
     }
     _authToken = vals['authToken'];
     _confirmRequest = vals['confirmRequest'];
+    _clientName = vals['name'];
     _clientEmail = vals['email'];
     _validate();
   }
@@ -126,6 +127,7 @@ class _Session {
     _storage.deleteAll();
     _writeKey('version', _version);
     _writeKey('authToken', _authToken);
+    _writeKey('name', _clientName);
     _writeKey('email', _clientEmail);
     _writeKey('confirmRequest', _confirmRequest);
   }
@@ -139,6 +141,7 @@ class _Session {
 
   _validate() {
     if (_clientEmail == null) {
+      _clientName = null;
       _authToken = null;
       _confirmRequest = null;
     }
@@ -153,6 +156,10 @@ class _Session {
   }
 
   String _decodeUnexpectedError(final http.Response response) {
+    return 'Server error, please try again later';
+  }
+
+  String _decodeResponseFormatError(final http.Response response) {
     return 'Server error, please try again later';
   }
 
@@ -174,17 +181,33 @@ class _Session {
         body: jsonEncode(request.toJson()));
   }
 
-  void _updateCofirmRequest(final String email, final http.Response response) {
-    _clientEmail = email;
-    _confirmRequest = backend.CredentialsConfirmationRequest.fromJson(
-            json.decode(response.body))
-        .confirmation;
+  String _saveUserInfo(final http.Response response) {
+    backend.ClientInfo info;
+    try {
+      info = backend.ClientInfo.fromJson(json.decode(response.body));
+    } on FormatException {
+      return _decodeResponseFormatError(response);
+    }
+    _clientName = info.name;
+    _clientEmail = info.email;
+    _saveAuth(response);
+    return null;
+  }
+
+  String _saveCofirmRequest(final http.Response response) {
+    try {
+      _confirmRequest = backend.CredentialsConfirmationRequest.fromJson(
+              json.decode(response.body))
+          .confirmation;
+    } on FormatException {
+      return _decodeResponseFormatError(response);
+    }
     _twoFaCodeResendCountdown = DateTime.now().toUtc();
     _save();
     return null;
   }
 
-  _updateAuth(final http.Response response) {
+  _saveAuth(final http.Response response) {
     final authToken = response.headers["Auth-Token"];
     if (authToken == null || _authToken == authToken) {
       return;

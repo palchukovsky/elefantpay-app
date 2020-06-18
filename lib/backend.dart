@@ -31,6 +31,29 @@ class ClientCredentials extends Request {
   Map<String, dynamic> toJson() => {'email': email, 'password': password};
 }
 
+class ClientRegistration extends Request {
+  final String name;
+  final String email;
+  final String password;
+
+  ClientRegistration(this.name, this.email, this.password);
+
+  @override
+  Map<String, dynamic> toJson() =>
+      {'name': name, 'email': email, 'password': password};
+}
+
+class ClientInfo {
+  final String name;
+  final String email;
+
+  ClientInfo(this.name, this.email);
+
+  factory ClientInfo.fromJson(Map<String, dynamic> json) {
+    return ClientInfo(json['name'], json['email']);
+  }
+}
+
 class CredentialsConfirmationRequest {
   final String confirmation;
 

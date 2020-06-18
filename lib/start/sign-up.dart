@@ -13,6 +13,10 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends CredsPageState<SignUpPage> {
+  String _name;
+  final TextEditingController _nameController = TextEditingController();
+  final FocusNode _nameFocus = FocusNode();
+
   final TextEditingController _passwordConfirmController =
       TextEditingController();
   final FocusNode _passwordConfirmFocus = FocusNode();
@@ -21,7 +25,7 @@ class _SignUpPageState extends CredsPageState<SignUpPage> {
 
   @override
   Future<String> request(String email, String password) {
-    return session.register(email, password);
+    return session.register(_name, email, password);
   }
 
   @override
@@ -30,6 +34,23 @@ class _SignUpPageState extends CredsPageState<SignUpPage> {
         MaterialPageRoute(builder: (context) => ConfirmationPage()),
         (Route<dynamic> route) => false);
     return true;
+  }
+
+  @protected
+  Widget buildAccountFields(BuildContext context, FocusNode emailFocus) {
+    return Column(children: <Widget>[
+      TextFormField(
+          decoration: const InputDecoration(
+              hintText: 'Enter your name', labelText: 'Your name'),
+          validator: (input) => input.isEmpty ? 'Name required' : null,
+          keyboardType: TextInputType.text,
+          onSaved: (value) => _name = value.trim(),
+          controller: _nameController,
+          focusNode: _nameFocus,
+          onFieldSubmitted: (term) =>
+              focusChange(context, _nameFocus, emailFocus)),
+      super.buildAccountFields(context, emailFocus)
+    ]);
   }
 
   @override

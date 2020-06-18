@@ -48,18 +48,9 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
                   if (!_isKeyboardVisible) Logo(),
                   Text(title, style: Theme.of(context).textTheme.headline6),
                   if (_error != null) buildError(context),
-                  EmailFormField(
-                      controller: _emailController,
-                      onSaved: (value) => setState(() => _email = value),
-                      focusNode: _emailFocus,
-                      onFieldSubmitted: (term) =>
-                          focusChange(context, _emailFocus, _passwordFocus)),
-                  buildPasswordFields(
-                      context,
-                      _passwordController,
-                      _passwordFocus,
-                      (value) => setState(() => _password = value),
-                      _request),
+                  buildAccountFields(context, _emailFocus),
+                  buildPasswordFields(context, _passwordController,
+                      _passwordFocus, (value) => _password = value, _request),
                   Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: RaisedButton(
@@ -79,12 +70,23 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
   }
 
   @protected
+  Widget buildAccountFields(BuildContext context, FocusNode emailFocus) {
+    return EmailFormField(
+        controller: _emailController,
+        onSaved: (value) => _email = value,
+        focusNode: emailFocus,
+        onFieldSubmitted: (term) =>
+            focusChange(context, emailFocus, _passwordFocus));
+  }
+
+  @protected
   Widget buildPasswordFields(
       BuildContext context,
       TextEditingController passwordController,
       FocusNode passwordFocus,
       FormFieldSetter<String> onSaved,
       void Function() submit);
+
   @protected
   List<Widget> buildExtra(BuildContext context);
 

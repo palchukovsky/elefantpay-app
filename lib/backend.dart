@@ -12,6 +12,15 @@ class Error {
   }
 }
 
+class ClientEmail extends Request {
+  final String email;
+
+  ClientEmail(this.email);
+
+  @override
+  Map<String, dynamic> toJson() => {'email': email};
+}
+
 class ClientCredentials extends Request {
   final String email;
   final String password;

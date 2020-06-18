@@ -15,6 +15,7 @@ class ConfirmationPage extends StatefulWidget {
 }
 
 class _ConfirmationPageState extends State<ConfirmationPage> {
+  static const _pinLength = 5;
   var _isBusy = false;
   String _error;
   String _twofaCodeResendCountDown;
@@ -64,11 +65,11 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                       onFieldSubmitted: (term) =>
                           focusEnd(context, _focusNode, _request),
                       textAlign: TextAlign.center,
-                      maxLength: 4,
+                      maxLength: _pinLength,
                       validator: (input) => input.isEmpty
                           ? 'PIN is required'
-                          : input.length != 4
-                              ? 'PIN has length 4 digits'
+                          : input.length != _pinLength
+                              ? 'PIN has length $_pinLength digits'
                               : null,
                       inputFormatters: [
                         WhitelistingTextInputFormatter(RegExp("[\\d]"))
@@ -132,9 +133,15 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
   }
 
   _resend2faCode() async {
+    setState(() {
+      _isBusy = true;
+    });
     final error = await session.resend2faCode();
-    setState(() => _error = error);
     _check2FaCodeResendAbility();
+    setState(() {
+      _isBusy = false;
+      _error = error;
+    });
   }
 
   _check2FaCodeResendAbility() {

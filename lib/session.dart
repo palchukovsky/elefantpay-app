@@ -6,6 +6,8 @@ import 'backend.dart' as backend;
 final session = _Session();
 
 class _Session {
+  static const _backendUrl = 'https://api-dev.elefantpay.com/';
+
   FlutterSecureStorage _storage;
 
   static const _version = "1";
@@ -51,8 +53,21 @@ class _Session {
   }
 
   Future<String> resend2faCode() async {
-    _twoFaCodeResendCountdown = DateTime.now().toUtc();
-    return null;
+    final response = await _put(
+        'client/credentials/confirmation', backend.ClientEmail(_clientEmail));
+    switch (response.statusCode) {
+      case 202:
+        _updateCofirmRequest(_clientEmail, response);
+        return null;
+      case 400: // The request has invalid parameters.
+      case 404: // Provided credentials are not used for any client.
+        return _decodeError(response);
+      case 409:
+        return 'Account already is confirmed, you may sign-in';
+      case 425:
+        return 'Please wait more to send new request';
+    }
+    return _decodeUnexpectedError(response);
   }
 
   Future<String> confirm(final String token) async {
@@ -143,7 +158,16 @@ class _Session {
 
   Future<http.Response> _post(
       final String method, final backend.Request request) {
-    return http.post('https://api-dev.elefantpay.com/' + method,
+    return http.post(_backendUrl + method,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(request.toJson()));
+  }
+
+  Future<http.Response> _put(
+      final String method, final backend.Request request) {
+    return http.put(_backendUrl + method,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },

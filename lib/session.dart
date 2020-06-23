@@ -6,7 +6,7 @@ import 'backend.dart' as backend;
 final session = _Session();
 
 class _Session {
-  static const _backendUrl = 'https://api-dev.elefantpay.com/';
+  static const _backendUrl = 'https://api.elefantpay.com/';
 
   FlutterSecureStorage _storage;
 

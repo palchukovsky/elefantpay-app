@@ -2,21 +2,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'backend.dart' as backend;
+import 'config.dart';
 
 final session = _Session();
 
 class _Session {
-  static const _backendUrl = 'https://api.elefantpay.com/';
-
-  FlutterSecureStorage _storage;
-
-  static const _version = "1";
-  String _authToken;
-  String _clientName;
-  String _clientEmail;
-  String _confirmRequest;
-  var _twoFaCodeResendCountdown = DateTime.now().toUtc();
-
   bool get isAuthed => _authToken != null;
   String authToken() => _authToken;
 
@@ -165,7 +155,7 @@ class _Session {
 
   Future<http.Response> _post(
       final String method, final backend.Request request) {
-    return http.post(_backendUrl + method,
+    return http.post(config.backendUrl + method,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
@@ -174,7 +164,7 @@ class _Session {
 
   Future<http.Response> _put(
       final String method, final backend.Request request) {
-    return http.put(_backendUrl + method,
+    return http.put(config.backendUrl + method,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
@@ -215,4 +205,13 @@ class _Session {
     _authToken = authToken;
     _save();
   }
+
+  FlutterSecureStorage _storage;
+
+  static const _version = "1";
+  String _authToken;
+  String _clientName;
+  String _clientEmail;
+  String _confirmRequest;
+  var _twoFaCodeResendCountdown = DateTime.now().toUtc();
 }

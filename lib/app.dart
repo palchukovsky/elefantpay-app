@@ -3,7 +3,7 @@ import 'start/sign-in.dart';
 import 'start/confirmation.dart';
 import 'session.dart';
 import 'config.dart';
-import 'home.dart';
+import 'acc/home.dart';
 import 'package:flutter/material.dart';
 
 void runTheApp(final Config newConfig) {

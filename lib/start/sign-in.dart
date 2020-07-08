@@ -3,7 +3,7 @@ import 'confirmation.dart';
 import 'fields.dart';
 import 'creds-page.dart';
 import '../session.dart';
-import '../home.dart';
+import '../acc/home.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
@@ -17,7 +17,7 @@ class _SignInPageState extends CredsPageState<SignInPage> {
   _SignInPageState() : super('Sign In to Your Account', 'Sign In');
 
   @override
-  Future<String> request(String email, String password) {
+  Future<void> request(String email, String password) {
     return session.login(email, password);
   }
 

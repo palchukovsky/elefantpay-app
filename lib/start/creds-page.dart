@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'fields.dart';
 import '../help.dart';
+import '../fields.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
+import 'dart:async';
 
 @optionalTypeArgs
 abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
@@ -91,26 +94,22 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
   List<Widget> buildExtra(BuildContext context);
 
   @protected
-  Future<String> request(String email, String password);
+  Future<void> request(String email, String password);
 
   @protected
   bool handleSuccess() => false;
 
-  Future<bool> _request() async {
+  _request() async {
     if (!_formKey.currentState.validate()) {
       return false;
     }
     setState(() => _isBusy = true);
     _formKey.currentState.save();
-
-    final error = await request(_email, _password);
-    if (error == null && handleSuccess()) {
-      return true;
-    }
-    setState(() {
-      _error = error;
-      _isBusy = false;
-    });
-    return false;
+    request(_email, _password)
+        .then((final value) => handleSuccess())
+        .catchError((final error) => setState(() {
+              _error = error;
+              _isBusy = false;
+            }));
   }
 }

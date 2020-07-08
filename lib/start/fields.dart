@@ -66,15 +66,6 @@ class PasswordFormField extends TextFormField {
             onFieldSubmitted: onFieldSubmitted);
 }
 
-class ErrorFormText extends Padding {
-  ErrorFormText(final String error, BuildContext context)
-      : super(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(error,
-                style: TextStyle(color: Theme.of(context).errorColor),
-                textAlign: TextAlign.center));
-}
-
 focusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
   currentFocus.unfocus();
   FocusScope.of(context).requestFocus(nextFocus);
@@ -83,7 +74,9 @@ focusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
 focusEnd(BuildContext context, FocusNode currentFocus,
     Future<bool> Function() submit) async {
   currentFocus.unfocus();
-  if (!await submit()) {
-    currentFocus.requestFocus();
-  }
+  submit().then((final bool value) {
+    if (!value) {
+      currentFocus.requestFocus();
+    }
+  });
 }

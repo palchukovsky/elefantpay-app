@@ -24,7 +24,7 @@ class _SignUpPageState extends CredsPageState<SignUpPage> {
   _SignUpPageState() : super('Create Your New Account', 'Sign Up');
 
   @override
-  Future<String> request(String email, String password) {
+  Future<void> request(String email, String password) {
     return session.register(_name, email, password);
   }
 

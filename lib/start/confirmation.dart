@@ -1,8 +1,9 @@
 import 'sign-in.dart';
 import 'fields.dart';
-import '../home.dart';
+import '../acc/home.dart';
 import '../session.dart';
 import '../help.dart';
+import '../fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
@@ -115,32 +116,44 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
     if (!_formKey.currentState.validate()) {
       return false;
     }
+
     setState(() => _isBusy = true);
     _formKey.currentState.save();
 
-    final error = await session.confirm(_token);
-    if (error == null) {
+    var result = Completer<bool>();
+    session.confirm(_token).then((final value) => null).then((value) {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => HomePage()),
           (Route<dynamic> route) => false);
-      return true;
-    }
-    setState(() {
-      _error = error;
-      _isBusy = false;
+      result.complete(true);
+    }).catchError((final error) {
+      setState(() {
+        _error = error;
+        _isBusy = false;
+        result.complete(false);
+      });
     });
-    return false;
+
+    return result.future;
   }
 
   _resend2faCode() async {
     setState(() {
       _isBusy = true;
     });
-    final error = await session.resend2faCode();
-    _check2FaCodeResendAbility();
-    setState(() {
-      _isBusy = false;
-      _error = error;
+
+    session.resend2faCode().then((final value) {
+      _check2FaCodeResendAbility();
+      setState(() {
+        _isBusy = false;
+        _error = null;
+      });
+    }).catchError((final error) {
+      _check2FaCodeResendAbility();
+      setState(() {
+        _isBusy = false;
+        _error = error;
+      });
     });
   }
 

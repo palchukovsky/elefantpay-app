@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../help.dart';
 import '../session.dart';
 import '../backend.dart';
@@ -24,12 +25,14 @@ class _MoneyPageState extends State<MoneyPage> {
         });
         return;
       }
-      _revision = 0;
       final accId = accounts.keys.first;
       session
-          .requestAccountDetails(accId, _revision)
+          .requestAccountDetails(
+              accId, _details == null ? 0 : _details.revision)
           .then((details) => setState(() {
-                _details = details;
+                if (details != null) {
+                  _details = details;
+                }
                 _error = null;
               }))
           .catchError((error) => setState(() => _error = error));
@@ -37,7 +40,7 @@ class _MoneyPageState extends State<MoneyPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (_details == null) {
       if (_error != null) {
         return Scaffold(body: Center(child: ErrorFormText(_error, context)));
@@ -45,31 +48,71 @@ class _MoneyPageState extends State<MoneyPage> {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    var actions = <Widget>[];
+    final balance = _moneyValueFormat.format(_details.balance);
+
+    final actions = <TableRow>[];
     _details.history.forEach((v) {
-      actions.add(Text('${v.time}: ${v.value} - ${v.subject}'));
+      actions.add(_buildAction(v, context));
     });
-    final details = Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: actions);
 
     return Scaffold(
-        appBar: AppBar(title: Text('Home')),
+        appBar: AppBar(title: Text('Money')),
         body: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
+                children: [
               if (_error != null) ErrorFormText(_error, context),
-              Text('${_details.balance} ${_details.currency}',
-                  style: Theme.of(context).textTheme.headline2),
-              details
+              Text('$balance ${_details.currency}',
+                  style: Theme.of(context).textTheme.headline4),
+              Table(children: actions, columnWidths: <int, TableColumnWidth>{
+                1: FlexColumnWidth(0.3)
+              }),
+              Spacer()
             ])),
         floatingActionButton: HelpFloatingButton());
   }
 
+  TableRow _buildAction(
+      final AccountAction action, final BuildContext context) {
+    final subject =
+        "${action.subject[0].toUpperCase()}${action.subject.substring(1)}";
+    return TableRow(children: [
+      Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 3.0, horizontal: 5.0),
+                child: Text(subject,
+                    style: Theme.of(context).textTheme.headline6)),
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 3.0, horizontal: 5.0),
+                child: Text(
+                    _timeFormat.format(action.time) +
+                        ", " +
+                        _dateFormat.format(action.time),
+                    style: Theme.of(context).textTheme.subtitle1))
+          ]),
+      Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 3.0, horizontal: 5.0),
+                child: Text(_moneyValueFormat.format(action.value),
+                    style: Theme.of(context).textTheme.headline6))
+          ])
+    ]);
+  }
+
   AccountDetails _details;
   String _error;
-  int _revision = 0;
+
+  final _moneyValueFormat = NumberFormat('#,##0.00', 'en_EN');
+  final _dateFormat = DateFormat("EEEE, MMMM d, yyyy");
+  final _timeFormat = DateFormat("Hm");
 }

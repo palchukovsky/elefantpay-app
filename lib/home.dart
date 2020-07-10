@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             Spacer(),
             Text('New ultimate mobile wallet'),
-            Text('ElefantPay', style: Theme.of(context).textTheme.headline2),
+            Text('Elefantpay', style: Theme.of(context).textTheme.headline2),
             Text('coming soon', style: Theme.of(context).textTheme.headline4),
             Spacer(),
             Text('Your account ${session.clientEmail} is registered.',

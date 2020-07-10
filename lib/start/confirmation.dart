@@ -1,6 +1,6 @@
 import 'sign-in.dart';
 import 'fields.dart';
-import '../acc/home.dart';
+import '../page/money.dart';
 import '../session.dart';
 import '../help.dart';
 import '../fields.dart';
@@ -123,7 +123,7 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
     var result = Completer<bool>();
     session.confirm(_token).then((final value) => null).then((value) {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => MoneyPage()),
           (Route<dynamic> route) => false);
       result.complete(true);
     }).catchError((final error) {

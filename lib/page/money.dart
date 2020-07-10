@@ -4,14 +4,14 @@ import '../session.dart';
 import '../backend.dart';
 import '../fields.dart';
 
-class HomePage extends StatefulWidget {
-  HomePage({Key key}) : super(key: key);
+class MoneyPage extends StatefulWidget {
+  MoneyPage({Key key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _MoneyPageState createState() => _MoneyPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MoneyPageState extends State<MoneyPage> {
   @protected
   void initState() {
     super.initState();

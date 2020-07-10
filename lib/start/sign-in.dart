@@ -3,7 +3,7 @@ import 'confirmation.dart';
 import 'fields.dart';
 import 'creds-page.dart';
 import '../session.dart';
-import '../acc/home.dart';
+import '../page/money.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
@@ -24,7 +24,7 @@ class _SignInPageState extends CredsPageState<SignInPage> {
   @override
   bool handleSuccess() {
     Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => MoneyPage()),
         (Route<dynamic> route) => false);
     return true;
   }

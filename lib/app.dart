@@ -3,7 +3,7 @@ import 'start/sign-in.dart';
 import 'start/confirmation.dart';
 import 'session.dart';
 import 'config.dart';
-import 'acc/home.dart';
+import 'page/money.dart';
 import 'package:flutter/material.dart';
 
 void runTheApp(final Config newConfig) {
@@ -31,7 +31,7 @@ class App extends StatelessWidget {
             } else if (!session.isAuthed) {
               home = SignInPage();
             } else {
-              home = HomePage();
+              home = MoneyPage();
             }
             break;
         }

@@ -36,7 +36,7 @@ class App extends StatelessWidget {
             break;
         }
         return MaterialApp(
-          title: 'ElefantPay',
+          title: 'Elefantpay',
           theme: ThemeData(
             primarySwatch: Colors.blue,
             visualDensity: VisualDensity.adaptivePlatformDensity,

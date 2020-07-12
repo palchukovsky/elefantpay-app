@@ -65,7 +65,7 @@ class _SignInPageState extends CredsPageState<SignInPage> {
         hint: 'Enter your password',
         onSaved: onSaved,
         focusNode: passwordFocus,
-        onFieldSubmitted: (term) => focusEnd(context, passwordFocus, submit));
+        onFieldSubmitted: (term) => endFocus(context, passwordFocus, submit));
   }
 
   @override

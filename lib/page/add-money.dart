@@ -47,7 +47,7 @@ class _AddMoneyPageState extends State<AddMoneyPage> {
           controller: _amountController,
           focusNode: _amountFocus,
           onFieldSubmitted: (v) =>
-              focusChange(context, _amountFocus, _numberFocus)),
+              changeFocus(context, _amountFocus, _numberFocus)),
       Text('Actual balance: $_balance $_currency'),
       Spacer(),
       TextFormField(
@@ -62,7 +62,7 @@ class _AddMoneyPageState extends State<AddMoneyPage> {
           controller: _numberController,
           focusNode: _numberFocus,
           onFieldSubmitted: (v) =>
-              focusChange(context, _numberFocus, _monthFocus)),
+              changeFocus(context, _numberFocus, _monthFocus)),
       DropdownButton<int>(
           value: 1,
           items: <int>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]

@@ -4,6 +4,7 @@ import '../help.dart';
 import '../session.dart';
 import '../backend.dart';
 import '../fields.dart';
+import '../navigation.dart';
 import 'add-money.dart';
 
 class MoneyPage extends StatefulWidget {
@@ -73,12 +74,13 @@ class _MoneyPageState extends State<MoneyPage> {
                       vertical: 3.0, horizontal: 5.0),
                   child: RaisedButton(
                       onPressed: () => _addMoney(context),
-                      child: Text('Add money'))),
+                      child: const Text('Add money'))),
               Table(children: actions, columnWidths: <int, TableColumnWidth>{
                 1: FlexColumnWidth(0.3)
               }),
               Spacer()
             ])),
+        bottomNavigationBar: buildBottomNavigationBar(0, context),
         floatingActionButton: HelpFloatingButton());
   }
 

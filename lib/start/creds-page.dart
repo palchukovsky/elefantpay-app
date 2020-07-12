@@ -79,7 +79,7 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
         onSaved: (value) => _email = value,
         focusNode: emailFocus,
         onFieldSubmitted: (term) =>
-            focusChange(context, emailFocus, _passwordFocus));
+            changeFocus(context, emailFocus, _passwordFocus));
   }
 
   @protected

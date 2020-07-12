@@ -15,12 +15,12 @@ class ErrorFormText extends Padding {
                 textAlign: TextAlign.center));
 }
 
-focusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+changeFocus(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
   currentFocus.unfocus();
   FocusScope.of(context).requestFocus(nextFocus);
 }
 
-focusEnd(BuildContext context, FocusNode currentFocus,
+endFocus(BuildContext context, FocusNode currentFocus,
     Future<bool> Function() submit) async {
   currentFocus.unfocus();
   submit().then((final bool value) {

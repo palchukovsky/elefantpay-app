@@ -63,7 +63,7 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                       controller: _controller,
                       focusNode: _focusNode,
                       onFieldSubmitted: (term) =>
-                          focusEnd(context, _focusNode, _request),
+                          endFocus(context, _focusNode, _request),
                       textAlign: TextAlign.center,
                       maxLength: _pinLength,
                       validator: (input) => input.isEmpty

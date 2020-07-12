@@ -49,7 +49,7 @@ class _SignUpPageState extends CredsPageState<SignUpPage> {
           controller: _nameController,
           focusNode: _nameFocus,
           onFieldSubmitted: (term) =>
-              focusChange(context, _nameFocus, emailFocus)),
+              changeFocus(context, _nameFocus, emailFocus)),
       super.buildAccountFields(context, emailFocus)
     ]);
   }
@@ -69,7 +69,7 @@ class _SignUpPageState extends CredsPageState<SignUpPage> {
           controller: passwordController,
           focusNode: passwordFocus,
           onFieldSubmitted: (term) =>
-              focusChange(context, passwordFocus, _passwordConfirmFocus)),
+              changeFocus(context, passwordFocus, _passwordConfirmFocus)),
       PasswordFormField(
           controller: _passwordConfirmController,
           label: 'Password confirmation',
@@ -79,7 +79,7 @@ class _SignUpPageState extends CredsPageState<SignUpPage> {
               : null,
           focusNode: _passwordConfirmFocus,
           onFieldSubmitted: (term) =>
-              focusEnd(context, _passwordConfirmFocus, submit))
+              endFocus(context, _passwordConfirmFocus, submit))
     ]);
   }
 

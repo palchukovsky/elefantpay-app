@@ -42,7 +42,7 @@ class _SignInPageState extends CredsPageState<SignInPage> {
           super.buildError(context),
           InkWell(
               child: Text('Confirm ' + session.clientEmail,
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.push(
                     context,
@@ -71,9 +71,10 @@ class _SignInPageState extends CredsPageState<SignInPage> {
   @override
   List<Widget> buildExtra(BuildContext context) {
     return <Widget>[
-      Text('Do not have an account? '),
+      const Text('Do not have an account? '),
       InkWell(
-          child: Text('Sign Up', style: TextStyle(fontWeight: FontWeight.bold)),
+          child: const Text('Sign Up',
+              style: TextStyle(fontWeight: FontWeight.bold)),
           onTap: () {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => SignUpPage()));

@@ -44,15 +44,15 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Spacer(),
+                  const Spacer(),
                   Text('Your account is almost ready!',
                       style: Theme.of(context).textTheme.headline6),
-                  Spacer(),
+                  const Spacer(),
                   Text(
                       'Check email ${session.clientEmail} ' +
                           'to confirm it and complete registration.',
                       textAlign: TextAlign.center),
-                  Spacer(),
+                  const Spacer(),
                   if (_error != null) ErrorFormText(_error, context),
                   TextFormField(
                       decoration: InputDecoration(
@@ -77,36 +77,38 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
                   Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: RaisedButton(
-                          onPressed: _request, child: Text("Confirm"))),
-                  Spacer(),
+                          onPressed: _request, child: const Text("Confirm"))),
+                  const Spacer(),
                   Row(children: <Widget>[
-                    Spacer(),
-                    Text('Resend PIN: '),
+                    const Spacer(),
+                    const Text('Resend PIN: '),
                     if (_twofaCodeResendCountDown == "")
                       InkWell(
-                          child: Text('Resend',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text('Resend',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
                           onTap: _resend2faCode),
                     if (_twofaCodeResendCountDown != "")
                       Text(_twofaCodeResendCountDown),
                     Spacer()
                   ]),
-                  Text(""),
+                  const Text(""),
                   Row(children: <Widget>[
-                    Spacer(),
-                    Text('Already confirmed? '),
+                    const Spacer(),
+                    const Text('Already confirmed? '),
                     InkWell(
-                        child: Text('Sign In',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: const Text('Sign In',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                         onTap: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => SignInPage()));
                         }),
-                    Spacer()
+                    const Spacer()
                   ]),
-                  Spacer(),
+                  Spacer()
                 ]))),
         floatingActionButton: HelpFloatingButton());
   }

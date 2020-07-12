@@ -47,7 +47,7 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Spacer(),
+                  const Spacer(),
                   if (!_isKeyboardVisible) Logo(),
                   Text(title, style: Theme.of(context).textTheme.headline6),
                   if (_error != null) buildError(context),
@@ -62,7 +62,7 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: buildExtra(context)),
-                  Spacer(),
+                  const Spacer(),
                 ]))),
         floatingActionButton: HelpFloatingButton());
   }

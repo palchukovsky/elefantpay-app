@@ -14,8 +14,17 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(final BuildContext context) {
+    var content;
     if (_isBusy) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      content = <Widget>[Center(child: CircularProgressIndicator())];
+    } else {
+      content = <Widget>[
+        const Spacer(),
+        InkWell(
+            child: Text('Logout', style: Theme.of(context).textTheme.headline6),
+            onTap: () => _logout()),
+        const Spacer()
+      ];
     }
     return Scaffold(
         appBar: AppBar(title: const Text('Account')),
@@ -23,14 +32,7 @@ class _AccountPageState extends State<AccountPage> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-              const Spacer(),
-              InkWell(
-                  child: Text('Logout',
-                      style: Theme.of(context).textTheme.headline6),
-                  onTap: () => _logout()),
-              const Spacer()
-            ])),
+                children: content)),
         bottomNavigationBar: buildBottomNavigationBar(2, context),
         floatingActionButton: HelpFloatingButton());
   }

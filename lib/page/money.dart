@@ -45,19 +45,40 @@ class _MoneyPageState extends State<MoneyPage> {
 
   @override
   Widget build(final BuildContext context) {
+    var content;
+
     if (_details == null) {
       if (_error != null) {
-        return Scaffold(body: Center(child: ErrorFormText(_error, context)));
+        content = <Widget>[Center(child: ErrorFormText(_error, context))];
+      } else {
+        content = <Widget>[CircularProgressIndicator()];
       }
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    } else {
+      final balance = _moneyValueFormat.format(_details.balance);
+      final actions = <TableRow>[];
+      _details.history.forEach((v) {
+        actions.add(_buildAction(v, context));
+      });
+      content = <Widget>[
+        if (_error != null) ErrorFormText(_error, context),
+        Padding(
+            padding: const EdgeInsets.symmetric(vertical: 48),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('$balance ${_details.currency}',
+                      style: Theme.of(context).textTheme.headline4),
+                  RaisedButton(
+                      onPressed: () => _addMoney(context),
+                      child: const Text('Add money'))
+                ])),
+        Table(
+            children: actions,
+            columnWidths: <int, TableColumnWidth>{1: FlexColumnWidth(0.4)}),
+        Spacer()
+      ];
     }
-
-    final balance = _moneyValueFormat.format(_details.balance);
-
-    final actions = <TableRow>[];
-    _details.history.forEach((v) {
-      actions.add(_buildAction(v, context));
-    });
 
     return Scaffold(
         appBar: AppBar(title: Text('Money')),
@@ -65,25 +86,7 @@ class _MoneyPageState extends State<MoneyPage> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-              if (_error != null) ErrorFormText(_error, context),
-              Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 48),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text('$balance ${_details.currency}',
-                            style: Theme.of(context).textTheme.headline4),
-                        RaisedButton(
-                            onPressed: () => _addMoney(context),
-                            child: const Text('Add money'))
-                      ])),
-              Table(children: actions, columnWidths: <int, TableColumnWidth>{
-                1: FlexColumnWidth(0.4)
-              }),
-              Spacer()
-            ])),
+                children: content)),
         bottomNavigationBar: buildBottomNavigationBar(0, context),
         floatingActionButton: HelpFloatingButton());
   }

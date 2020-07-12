@@ -88,7 +88,7 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
       TextEditingController passwordController,
       FocusNode passwordFocus,
       FormFieldSetter<String> onSaved,
-      void Function() submit);
+      Future<bool> Function() submit);
 
   @protected
   List<Widget> buildExtra(BuildContext context);
@@ -99,17 +99,25 @@ abstract class CredsPageState<T extends StatefulWidget> extends State<T> {
   @protected
   bool handleSuccess() => false;
 
-  _request() async {
+  Future<bool> _request() async {
     if (!_formKey.currentState.validate()) {
       return false;
     }
+
     setState(() => _isBusy = true);
     _formKey.currentState.save();
-    request(_email, _password)
-        .then((final value) => handleSuccess())
-        .catchError((final error) => setState(() {
-              _error = error;
-              _isBusy = false;
-            }));
+
+    final result = Completer<bool>();
+    request(_email, _password).then((final value) {
+      handleSuccess();
+      result.complete(true);
+    }).catchError((final error) {
+      setState(() {
+        _error = error;
+        _isBusy = false;
+      });
+      result.complete(false);
+    });
+    return result.future;
   }
 }

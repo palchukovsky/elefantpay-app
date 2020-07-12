@@ -73,7 +73,7 @@ class _Session {
   }
 
   Future register(
-      final String name, final String email, final String password) {
+      final String name, final String email, final String password) async {
     return _handleResponse(
         _post(
             'client', backend.ClientRegistration(name, email, password), false),
@@ -90,7 +90,7 @@ class _Session {
     });
   }
 
-  Future resend2faCode() {
+  Future resend2faCode() async {
     return _handleResponse(
         _put(
             'client/credentials/confirmation',
@@ -112,7 +112,7 @@ class _Session {
     });
   }
 
-  Future confirm(final String token) {
+  Future confirm(final String token) async {
     return _handleResponse(
         _post(
             'client/credentials/confirmation',
@@ -132,7 +132,7 @@ class _Session {
     });
   }
 
-  Future login(final String email, final String password) {
+  Future login(final String email, final String password) async {
     return _handleResponse(
         _post(
             'client/login', backend.ClientCredentials(email, password), false),
@@ -157,7 +157,7 @@ class _Session {
     _save();
   }
 
-  Future<Map<String, backend.AccountInfo>> requestAccountList() {
+  Future<Map<String, backend.AccountInfo>> requestAccountList() async {
     return _handleResponse(_get('account', true),
         (final http.Response response) {
       switch (response.statusCode) {
@@ -178,7 +178,7 @@ class _Session {
   }
 
   Future<backend.AccountDetails> requestAccountDetails(
-      final String id, final int from) {
+      final String id, final int from) async {
     return _handleResponse(_get('account/$id?from=$from', true),
         (final http.Response response) {
       switch (response.statusCode) {
@@ -198,8 +198,24 @@ class _Session {
     });
   }
 
-  Future _handleResponse<Result>(final Future<http.Response> response,
-      final Result Function(http.Response) hander) {
+  Future addMoney(final String account, final backend.BankCard card,
+      final double amount) async {
+    return _handleResponse(
+        _post('account/$account', backend.AddMoneyAction(amount, card), true),
+        (final http.Response response) {
+      switch (response.statusCode) {
+        case 200:
+        case 202:
+          return;
+        default:
+          break;
+      }
+      throw SessionException.createUnexpected(response);
+    });
+  }
+
+  Future<Result> _handleResponse<Result>(final Future<http.Response> response,
+      final Result Function(http.Response) hander) async {
     final completer = Completer<Result>();
     response.then((final http.Response httpResponse) {
       _saveAuth(httpResponse);
@@ -223,7 +239,7 @@ class _Session {
         return;
       }
       completer.complete(result);
-    }).catchError((error) => completer.completeError(error));
+    }).catchError((error) => completer.completeError(error.error));
     return completer.future;
   }
 
@@ -269,19 +285,19 @@ class _Session {
     }
   }
 
-  Future<http.Response> _post(
-      final String method, final backend.Request request, final bool isAuthed) {
+  Future<http.Response> _post(final String method,
+      final backend.Request request, final bool isAuthed) async {
     return http.post(config.backendUrl + method,
         headers: _getHeaders(isAuthed), body: jsonEncode(request.toJson()));
   }
 
-  Future<http.Response> _put(
-      final String method, final backend.Request request, final bool isAuthed) {
+  Future<http.Response> _put(final String method, final backend.Request request,
+      final bool isAuthed) async {
     return http.put(config.backendUrl + method,
         headers: _getHeaders(isAuthed), body: jsonEncode(request.toJson()));
   }
 
-  Future<http.Response> _get(final String method, final bool isAuthed) {
+  Future<http.Response> _get(final String method, final bool isAuthed) async {
     return http.get(config.backendUrl + method, headers: _getHeaders(isAuthed));
   }
 

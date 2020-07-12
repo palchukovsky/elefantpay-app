@@ -1,6 +1,7 @@
 import 'sign-up.dart';
 import 'confirmation.dart';
 import 'fields.dart';
+import '../fields.dart';
 import 'creds-page.dart';
 import '../session.dart';
 import '../page/money.dart';
@@ -57,7 +58,7 @@ class _SignInPageState extends CredsPageState<SignInPage> {
       TextEditingController passwordController,
       FocusNode passwordFocus,
       FormFieldSetter<String> onSaved,
-      void Function() submit) {
+      Future<bool> Function() submit) {
     return PasswordFormField(
         controller: passwordController,
         label: 'Password',

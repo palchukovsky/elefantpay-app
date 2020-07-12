@@ -4,39 +4,42 @@ import '../help.dart';
 import '../session.dart';
 import '../backend.dart';
 import '../fields.dart';
+import 'add-money.dart';
 
 class MoneyPage extends StatefulWidget {
-  MoneyPage({Key key}) : super(key: key);
+  MoneyPage({final Key key, final String account})
+      : _account = account,
+        super(key: key);
 
   @override
-  _MoneyPageState createState() => _MoneyPageState();
+  _MoneyPageState createState() => _MoneyPageState(account: _account);
+
+  final String _account;
 }
 
 class _MoneyPageState extends State<MoneyPage> {
+  _MoneyPageState({final String account}) : _account = account;
+
   @protected
   void initState() {
     super.initState();
 
-    session.requestAccountList().then((final accounts) {
-      if (accounts.length == 0) {
-        setState(() {
-          _details = null;
-          _error = 'No accounts found';
-        });
-        return;
-      }
-      final accId = accounts.keys.first;
-      session
-          .requestAccountDetails(
-              accId, _details == null ? 0 : _details.revision)
-          .then((details) => setState(() {
-                if (details != null) {
-                  _details = details;
-                }
-                _error = null;
-              }))
-          .catchError((error) => setState(() => _error = error));
-    }).catchError((error) => setState(() => _error = error));
+    if (_account == null) {
+      session.requestAccountList().then((final accounts) {
+        if (accounts.isEmpty) {
+          setState(() {
+            _account = null;
+            _details = null;
+            _error = 'No accounts found';
+          });
+          return;
+        }
+        _account = accounts.keys.first;
+        _requestAccountDetails();
+      }).catchError((error) => setState(() => _error = error));
+    } else {
+      _requestAccountDetails();
+    }
   }
 
   @override
@@ -65,6 +68,12 @@ class _MoneyPageState extends State<MoneyPage> {
               if (_error != null) ErrorFormText(_error, context),
               Text('$balance ${_details.currency}',
                   style: Theme.of(context).textTheme.headline4),
+              Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 3.0, horizontal: 5.0),
+                  child: RaisedButton(
+                      onPressed: () => _addMoney(context),
+                      child: Text('Add money'))),
               Table(children: actions, columnWidths: <int, TableColumnWidth>{
                 1: FlexColumnWidth(0.3)
               }),
@@ -109,6 +118,30 @@ class _MoneyPageState extends State<MoneyPage> {
     ]);
   }
 
+  _addMoney(final BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddMoneyPage(
+                _account,
+                _moneyValueFormat.format(_details.balance),
+                _details.currency)));
+  }
+
+  _requestAccountDetails() {
+    session
+        .requestAccountDetails(
+            _account, _details == null ? 0 : _details.revision)
+        .then((details) => setState(() {
+              if (details != null) {
+                _details = details;
+              }
+              _error = null;
+            }))
+        .catchError((error) => setState(() => _error = error));
+  }
+
+  String _account;
   AccountDetails _details;
   String _error;
 

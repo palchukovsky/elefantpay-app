@@ -2,6 +2,7 @@ import 'sign-in.dart';
 import 'confirmation.dart';
 import 'creds-page.dart';
 import 'fields.dart';
+import '../fields.dart';
 import '../session.dart';
 import 'package:flutter/material.dart';
 
@@ -59,7 +60,7 @@ class _SignUpPageState extends CredsPageState<SignUpPage> {
       TextEditingController passwordController,
       FocusNode passwordFocus,
       FormFieldSetter<String> onSaved,
-      void Function() submit) {
+      Future<bool> Function() submit) {
     return Column(children: <Widget>[
       PasswordFormField(
           label: 'Password',

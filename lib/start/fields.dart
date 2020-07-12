@@ -2,12 +2,6 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class FormRoot extends Center {
-  FormRoot(Widget child)
-      : super(
-            child: Padding(padding: const EdgeInsets.all(56.0), child: child));
-}
-
 class Logo extends Padding {
   Logo({final FormFieldSetter<String> onSaved})
       : super(
@@ -64,19 +58,4 @@ class PasswordFormField extends TextFormField {
             keyboardType: TextInputType.visiblePassword,
             onSaved: onSaved,
             onFieldSubmitted: onFieldSubmitted);
-}
-
-focusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
-  currentFocus.unfocus();
-  FocusScope.of(context).requestFocus(nextFocus);
-}
-
-focusEnd(BuildContext context, FocusNode currentFocus,
-    Future<bool> Function() submit) async {
-  currentFocus.unfocus();
-  submit().then((final bool value) {
-    if (!value) {
-      currentFocus.requestFocus();
-    }
-  });
 }

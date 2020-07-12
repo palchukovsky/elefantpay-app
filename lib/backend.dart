@@ -109,7 +109,7 @@ class AccountAction {
   AccountAction(this.time, this.value, this.subject, this.state, this.notes);
 
   factory AccountAction.fromJson(final Map<String, dynamic> json) {
-    return AccountAction(_parseDateTime(json['time']), json['value'],
+    return AccountAction(_parseDateTime(json['time']), json['value'].toDouble(),
         json['subject'], json['state'], json['notes']);
   }
 }
@@ -129,6 +129,33 @@ class AccountDetails {
     return AccountDetails(json['currency'], json['balance'].toDouble(),
         json['revision'], history);
   }
+}
+
+class BankCard extends Request {
+  final int number;
+  final int validThruMonth;
+  final int validThruYear;
+  final String cvc;
+
+  BankCard(this.number, this.validThruMonth, this.validThruYear, this.cvc);
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'number': number,
+        'validThruMonth': validThruMonth,
+        'validThruYear': validThruYear,
+        'cvc': cvc
+      };
+}
+
+class AddMoneyAction extends Request {
+  final double value;
+  final BankCard source;
+
+  AddMoneyAction(this.value, this.source);
+
+  @override
+  Map<String, dynamic> toJson() => {'value': value, 'source': source.toJson()};
 }
 
 DateTime _parseDateTime(final dynamic source) {

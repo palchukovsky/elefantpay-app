@@ -1,5 +1,4 @@
 import 'sign-in.dart';
-import 'fields.dart';
 import '../page/money.dart';
 import '../session.dart';
 import '../help.dart';
@@ -120,7 +119,7 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
     setState(() => _isBusy = true);
     _formKey.currentState.save();
 
-    var result = Completer<bool>();
+    final result = Completer<bool>();
     session.confirm(_token).then((final value) => null).then((value) {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => MoneyPage()),
@@ -130,8 +129,8 @@ class _ConfirmationPageState extends State<ConfirmationPage> {
       setState(() {
         _error = error;
         _isBusy = false;
-        result.complete(false);
       });
+      result.complete(false);
     });
 
     return result.future;

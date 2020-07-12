@@ -67,16 +67,20 @@ class _MoneyPageState extends State<MoneyPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
               if (_error != null) ErrorFormText(_error, context),
-              Text('$balance ${_details.currency}',
-                  style: Theme.of(context).textTheme.headline4),
               Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 3.0, horizontal: 5.0),
-                  child: RaisedButton(
-                      onPressed: () => _addMoney(context),
-                      child: const Text('Add money'))),
+                  padding: const EdgeInsets.symmetric(vertical: 48),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text('$balance ${_details.currency}',
+                            style: Theme.of(context).textTheme.headline4),
+                        RaisedButton(
+                            onPressed: () => _addMoney(context),
+                            child: const Text('Add money'))
+                      ])),
               Table(children: actions, columnWidths: <int, TableColumnWidth>{
-                1: FlexColumnWidth(0.3)
+                1: FlexColumnWidth(0.4)
               }),
               Spacer()
             ])),
@@ -95,17 +99,19 @@ class _MoneyPageState extends State<MoneyPage> {
           children: [
             Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 3.0, horizontal: 5.0),
-                child: Text(subject,
-                    style: Theme.of(context).textTheme.headline6)),
-            Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 3.0, horizontal: 5.0),
-                child: Text(
-                    _timeFormat.format(action.time) +
-                        ", " +
-                        _dateFormat.format(action.time),
-                    style: Theme.of(context).textTheme.subtitle1))
+                    const EdgeInsets.symmetric(vertical: 12.0, horizontal: 3.0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(subject,
+                          style: Theme.of(context).textTheme.headline6),
+                      Text(
+                          _timeFormat.format(action.time) +
+                              ", " +
+                              _dateFormat.format(action.time),
+                          style: Theme.of(context).textTheme.subtitle1)
+                    ]))
           ]),
       Column(
           mainAxisAlignment: MainAxisAlignment.center,

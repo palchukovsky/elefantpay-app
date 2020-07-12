@@ -153,8 +153,17 @@ class _Session {
   }
 
   Future logout() async {
-    _authToken = null;
-    _save();
+    final completer = Completer<void>();
+    _delete('client/login', true).then((final http.Response httpResponse) {
+      _authToken = null;
+      _save();
+      completer.complete(true);
+    }).catchError((error) {
+      _authToken = null;
+      _save();
+      completer.completeError(error.error);
+    });
+    return completer.future;
   }
 
   Future<Map<String, backend.AccountInfo>> requestAccountList() async {
@@ -299,6 +308,12 @@ class _Session {
 
   Future<http.Response> _get(final String method, final bool isAuthed) async {
     return http.get(config.backendUrl + method, headers: _getHeaders(isAuthed));
+  }
+
+  Future<http.Response> _delete(
+      final String method, final bool isAuthed) async {
+    return http.delete(config.backendUrl + method,
+        headers: _getHeaders(isAuthed));
   }
 
   _saveUserInfo(final http.Response response) {

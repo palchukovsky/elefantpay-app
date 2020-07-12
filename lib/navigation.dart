@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'page/money.dart';
+import 'page/payments.dart';
 import 'page/account.dart';
 
 buildBottomNavigationBar(final currentIndex, final BuildContext context) {
@@ -22,6 +23,9 @@ buildBottomNavigationBar(final currentIndex, final BuildContext context) {
       onTap: (final int index) {
         WidgetBuilder builder;
         switch (index) {
+          case 1:
+            builder = (context) => PaymentsPage();
+            break;
           case 2:
             builder = (context) => AccountPage();
             break;

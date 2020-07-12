@@ -18,7 +18,7 @@ class _AccountPageState extends State<AccountPage> {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
-        appBar: AppBar(title: const Text('Money')),
+        appBar: AppBar(title: const Text('Account')),
         body: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

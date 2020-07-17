@@ -77,11 +77,11 @@ class _Session {
     return _handleResponse(
         _post(
             'client', backend.ClientRegistration(name, email, password), false),
-        (final http.Response response) {
+        (final http.Response response) async {
       switch (response.statusCode) {
         case 201:
           _clientEmail = email;
-          _saveCofirmRequest(response);
+          await _saveCofirmRequest(response);
           return;
         case 409:
           throw SessionException('Email already used');
@@ -95,10 +95,10 @@ class _Session {
         _put(
             'client/credentials/confirmation',
             backend.ClientEmail(_clientEmail),
-            false), (final http.Response response) {
+            false), (final http.Response response) async {
       switch (response.statusCode) {
         case 202:
-          _saveCofirmRequest(response);
+          await _saveCofirmRequest(response);
           return;
         case 404: // Provided credentials are not used for any client.
           throw SessionException.createGeneral(response);
@@ -136,15 +136,15 @@ class _Session {
     return _handleResponse(
         _post(
             'client/login', backend.ClientCredentials(email, password), false),
-        (final http.Response response) {
+        (final http.Response response) async {
       switch (response.statusCode) {
         case 201:
-          _saveUserInfo(response);
+          await _saveUserInfo(response);
           break;
         case 404:
           throw SessionException('Email or password is invalid');
         case 422:
-          _saveCofirmRequest(response);
+          await _saveCofirmRequest(response);
           throw SessionException('Email or password is invalid');
         default:
           throw SessionException.createUnexpected(response);
@@ -154,13 +154,14 @@ class _Session {
 
   Future logout() async {
     final completer = Completer<void>();
-    _delete('client/login', true).then((final http.Response httpResponse) {
+    _delete('client/login', true)
+        .then((final http.Response httpResponse) async {
       _authToken = null;
-      _save();
+      await _save();
       completer.complete(true);
-    }).catchError((error) {
+    }).catchError((error) async {
       _authToken = null;
-      _save();
+      await _save();
       completer.completeError(error.error);
     });
     return completer.future;
@@ -168,7 +169,7 @@ class _Session {
 
   Future<Map<String, backend.AccountInfo>> requestAccountList() async {
     return _handleResponse(_get('account', true),
-        (final http.Response response) {
+        (final http.Response response) async {
       switch (response.statusCode) {
         case 200:
           {
@@ -189,7 +190,7 @@ class _Session {
   Future<backend.AccountDetails> requestAccountDetails(
       final String id, final int from) async {
     return _handleResponse(_get('account/$id?from=$from', true),
-        (final http.Response response) {
+        (final http.Response response) async {
       switch (response.statusCode) {
         case 200:
           {
@@ -224,10 +225,10 @@ class _Session {
   }
 
   Future<Result> _handleResponse<Result>(final Future<http.Response> response,
-      final Result Function(http.Response) hander) async {
+      final Future<Result> Function(http.Response) hander) async {
     final completer = Completer<Result>();
-    response.then((final http.Response httpResponse) {
-      _saveAuth(httpResponse);
+    response.then((final http.Response httpResponse) async {
+      await _saveAuth(httpResponse);
       switch (httpResponse.statusCode) {
         case 400: // The request has invalid parameters.
           completer.completeError(
@@ -235,14 +236,14 @@ class _Session {
           return;
         case 403:
           _authToken = null;
-          _save();
+          await _save();
           completer
               .completeError(SessionException.createAccessError().getMessage());
           return;
       }
       Result result;
       try {
-        result = hander(httpResponse);
+        result = await hander(httpResponse);
       } on SessionException catch (ex) {
         completer.completeError(ex.getMessage());
         return;
@@ -267,18 +268,18 @@ class _Session {
   _save() async {
     _validate();
     _storage.deleteAll();
-    _writeKey('version', _version);
-    _writeKey('authToken', _authToken);
-    _writeKey('name', _clientName);
-    _writeKey('email', _clientEmail);
-    _writeKey('confirmRequest', _confirmRequest);
+    await _writeKey('version', _version);
+    await _writeKey('authToken', _authToken);
+    await _writeKey('name', _clientName);
+    await _writeKey('email', _clientEmail);
+    await _writeKey('confirmRequest', _confirmRequest);
   }
 
   _writeKey(final String key, final String value) async {
     if (value == null) {
       return;
     }
-    _storage.write(key: key, value: value);
+    await _storage.write(key: key, value: value);
   }
 
   _validate() {
@@ -316,7 +317,7 @@ class _Session {
         headers: _getHeaders(isAuthed));
   }
 
-  _saveUserInfo(final http.Response response) {
+  _saveUserInfo(final http.Response response) async {
     backend.ClientInfo info;
     try {
       info = backend.ClientInfo.fromJson(json.decode(response.body));
@@ -325,10 +326,10 @@ class _Session {
     }
     _clientName = info.name;
     _clientEmail = info.email;
-    _save();
+    await _save();
   }
 
-  _saveCofirmRequest(final http.Response response) {
+  _saveCofirmRequest(final http.Response response) async {
     try {
       _confirmRequest = backend.CredentialsConfirmationRequest.fromJson(
               json.decode(response.body))
@@ -337,16 +338,16 @@ class _Session {
       throw SessionException.createResponseFormatError(response);
     }
     _twoFaCodeResendCountdown = DateTime.now().toUtc();
-    _save();
+    await _save();
   }
 
-  _saveAuth(final http.Response response) {
+  _saveAuth(final http.Response response) async {
     final authToken = response.headers['auth-token'];
     if (authToken == null || _authToken == authToken) {
       return;
     }
     _authToken = authToken;
-    _save();
+    await _save();
   }
 
   _getHeaders(final bool isAuthed) {
